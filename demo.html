@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调度管理系统 - Mock演示版</title>
+
+    <!-- Ant Design CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/antd@5.12.0/dist/reset.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f0f2f5;
+        }
+
+        .app-layout {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            background: #001529;
+            color: white;
+            padding: 0 50px;
+            display: flex;
+            align-items: center;
+            height: 64px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .app-logo {
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 40px;
+        }
+
+        .app-nav {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .nav-item {
+            color: rgba(255,255,255,0.65);
+            padding: 20px 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-item:hover {
+            color: white;
+        }
+
+        .nav-item.active {
+            color: white;
+            border-bottom-color: #1890ff;
+        }
+
+        .app-content {
+            flex: 1;
+            padding: 24px 50px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 16px 24px;
+            margin-bottom: 16px;
+            border-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 500;
+            color: rgba(0,0,0,0.85);
+        }
+
+        .content-card {
+            background: white;
+            padding: 24px;
+            border-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            width: 200px;
+            padding: 4px 11px;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            border-color: #40a9ff;
+            outline: none;
+        }
+
+        .btn {
+            padding: 4px 15px;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            color: #40a9ff;
+            border-color: #40a9ff;
+        }
+
+        .btn-primary {
+            background: #1890ff;
+            border-color: #1890ff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #40a9ff;
+            border-color: #40a9ff;
+            color: white;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .data-table th {
+            background: #fafafa;
+            font-weight: 500;
+            color: rgba(0,0,0,0.85);
+        }
+
+        .data-table tr:hover {
+            background: #fafafa;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+
+        .status-enabled {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .status-disabled {
+            background: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+
+        .status-developing {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        .status-success {
+            background: #f6ffed;
+            color: #52c41a;
+            border: 1px solid #b7eb8f;
+        }
+
+        .status-failed {
+            background: #fff1f0;
+            color: #ff4d4f;
+            border: 1px solid #ffccc7;
+        }
+
+        .status-running {
+            background: #e6f7ff;
+            color: #1890ff;
+            border: 1px solid #91d5ff;
+        }
+
+        .status-waiting {
+            background: #fffbe6;
+            color: #faad14;
+            border: 1px solid #ffe58f;
+        }
+
+        .pagination {
+            margin-top: 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .page-info {
+            color: rgba(0,0,0,0.45);
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .action-link {
+            color: #1890ff;
+            cursor: pointer;
+            margin-right: 12px;
+        }
+
+        .action-link:hover {
+            color: #40a9ff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: rgba(0,0,0,0.25);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .stat-label {
+            color: rgba(0,0,0,0.45);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: 500;
+            color: rgba(0,0,0,0.85);
+        }
+
+        .type-badge {
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 12px;
+            background: #f0f0f0;
+        }
+
+        .type-sql {
+            background: #e6f7ff;
+            color: #1890ff;
+        }
+
+        .type-shell {
+            background: #fff0f6;
+            color: #eb2f96;
+        }
+
+        .type-python {
+            background: #fcffe6;
+            color: #faad14;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <div class="app-header">
+            <div class="app-logo">⚙️ 调度管理系统</div>
+            <div class="app-nav">
+                <div class="nav-item active" data-page="tasks">任务管理</div>
+                <div class="nav-item" data-page="datasources">数据源管理</div>
+                <div class="nav-item" data-page="instances">实例管理</div>
+                <div class="nav-item" data-page="servers">服务器管理</div>
+            </div>
+            <div style="color: rgba(255,255,255,0.45); font-size: 12px;">
+                Mock演示版本
+            </div>
+        </div>
+
+        <div class="app-content">
+            <!-- Dashboard页面 -->
+            <div id="dashboard-page" class="page hidden">
+                <div class="page-header">
+                    <div class="page-title">系统概览</div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-label">总任务数</div>
+                        <div class="stat-value">30</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">运行中实例</div>
+                        <div class="stat-value">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">数据源</div>
+                        <div class="stat-value">10</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">在线服务器</div>
+                        <div class="stat-value">4</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务管理页面 -->
+            <div id="tasks-page" class="page">
+                <div class="page-header">
+                    <div class="page-title">任务管理</div>
+                </div>
+                <div class="content-card">
+                    <div class="toolbar">
+                        <input type="text" class="search-input" id="task-search" placeholder="搜索任务名称">
+                        <select class="search-input" id="task-type-filter">
+                            <option value="">全部类型</option>
+                            <option value="SQL">SQL</option>
+                            <option value="SHELL">Shell</option>
+                            <option value="PYTHON">Python</option>
+                        </select>
+                        <select class="search-input" id="task-status-filter">
+                            <option value="">全部状态</option>
+                            <option value="ENABLED">启用</option>
+                            <option value="DISABLED">禁用</option>
+                            <option value="DEVELOPING">开发中</option>
+                        </select>
+                        <button class="btn btn-primary">创建任务</button>
+                    </div>
+                    <table class="data-table" id="tasks-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>任务名称</th>
+                                <th>任务类型</th>
+                                <th>状态</th>
+                                <th>责任人</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasks-tbody">
+                            <!-- 由 JavaScript 填充 -->
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <span class="page-info">共 <span id="task-total">0</span> 条</span>
+                        <button class="btn" id="task-prev">上一页</button>
+                        <span class="page-info">第 <span id="task-current">1</span> / <span id="task-pages">1</span> 页</span>
+                        <button class="btn" id="task-next">下一页</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据源管理页面 -->
+            <div id="datasources-page" class="page hidden">
+                <div class="page-header">
+                    <div class="page-title">数据源管理</div>
+                </div>
+                <div class="content-card">
+                    <div class="toolbar">
+                        <input type="text" class="search-input" id="ds-search" placeholder="搜索数据源名称">
+                        <button class="btn btn-primary">创建数据源</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>数据源名称</th>
+                                <th>类型</th>
+                                <th>连接地址</th>
+                                <th>描述</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="datasources-tbody">
+                            <!-- 由 JavaScript 填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 实例管理页面 -->
+            <div id="instances-page" class="page hidden">
+                <div class="page-header">
+                    <div class="page-title">实例管理</div>
+                </div>
+                <div class="content-card">
+                    <div class="toolbar">
+                        <input type="text" class="search-input" id="instance-search" placeholder="搜索实例名称">
+                        <select class="search-input" id="instance-status-filter">
+                            <option value="">全部状态</option>
+                            <option value="SUCCESS">成功</option>
+                            <option value="FAILED">失败</option>
+                            <option value="RUNNING">运行中</option>
+                            <option value="WAITING">等待中</option>
+                        </select>
+                        <input type="date" class="search-input" id="instance-date">
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>实例ID</th>
+                                <th>实例名称</th>
+                                <th>任务名称</th>
+                                <th>状态</th>
+                                <th>业务日期</th>
+                                <th>开始时间</th>
+                                <th>执行时长</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="instances-tbody">
+                            <!-- 由 JavaScript 填充 -->
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <span class="page-info">共 <span id="instance-total">0</span> 条</span>
+                        <button class="btn" id="instance-prev">上一页</button>
+                        <span class="page-info">第 <span id="instance-current">1</span> / <span id="instance-pages">1</span> 页</span>
+                        <button class="btn" id="instance-next">下一页</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 服务器管理页面 -->
+            <div id="servers-page" class="page hidden">
+                <div class="page-header">
+                    <div class="page-title">服务器管理</div>
+                </div>
+                <div class="content-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>服务器名称</th>
+                                <th>IP地址</th>
+                                <th>角色</th>
+                                <th>状态</th>
+                                <th>CPU核数</th>
+                                <th>内存(MB)</th>
+                                <th>当前任务数</th>
+                                <th>最大任务数</th>
+                                <th>最后心跳</th>
+                            </tr>
+                        </thead>
+                        <tbody id="servers-tbody">
+                            <!-- 由 JavaScript 填充 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock数据
+        const mockData = {
+            tasks: [
+                {id: 1, taskName: 'user_behavior_etl', taskType: 'SQL', status: 'ENABLED', owner: 'zhangsan@company.com', createTime: '2026-01-10 09:00:00'},
+                {id: 2, taskName: 'data_backup_script', taskType: 'SHELL', status: 'ENABLED', owner: 'lisi@company.com', createTime: '2026-01-10 09:30:00'},
+                {id: 3, taskName: 'ml_model_training', taskType: 'PYTHON', status: 'DEVELOPING', owner: 'wangwu@company.com', createTime: '2026-01-15 10:00:00'},
+                {id: 4, taskName: 'order_stat_daily', taskType: 'SQL', status: 'ENABLED', owner: 'zhangsan@company.com', createTime: '2026-01-10 10:00:00'},
+                {id: 5, taskName: 'log_cleanup', taskType: 'SHELL', status: 'ENABLED', owner: 'lisi@company.com', createTime: '2026-01-11 11:00:00'},
+                {id: 6, taskName: 'product_recommendation', taskType: 'PYTHON', status: 'ENABLED', owner: 'wangwu@company.com', createTime: '2026-01-12 12:00:00'},
+                {id: 7, taskName: 'sales_report_monthly', taskType: 'SQL', status: 'DISABLED', owner: 'zhangsan@company.com', createTime: '2026-01-13 13:00:00'},
+                {id: 8, taskName: 'database_backup', taskType: 'SHELL', status: 'ENABLED', owner: 'lisi@company.com', createTime: '2026-01-14 14:00:00'},
+                {id: 9, taskName: 'churn_prediction', taskType: 'PYTHON', status: 'DEVELOPING', owner: 'wangwu@company.com', createTime: '2026-01-15 15:00:00'},
+                {id: 10, taskName: 'inventory_sync', taskType: 'SQL', status: 'ENABLED', owner: 'zhangsan@company.com', createTime: '2026-01-16 16:00:00'}
+            ],
+            datasources: [
+                {id: 1, name: 'mysql_prod', type: 'MYSQL', jdbcUrl: 'jdbc:mysql://192.168.1.100:3306/production', description: '生产环境MySQL'},
+                {id: 2, name: 'hive_warehouse', type: 'HIVE', jdbcUrl: 'jdbc:hive2://192.168.1.101:10000/warehouse', description: 'Hive数仓'},
+                {id: 3, name: 'clickhouse_olap', type: 'CLICKHOUSE', jdbcUrl: 'jdbc:clickhouse://192.168.1.102:8123/olap', description: 'ClickHouse OLAP'},
+                {id: 4, name: 'mysql_test', type: 'MYSQL', jdbcUrl: 'jdbc:mysql://192.168.1.103:3306/test', description: '测试环境MySQL'},
+                {id: 5, name: 'spark_cluster', type: 'SPARK', jdbcUrl: 'spark://192.168.1.104:7077', description: 'Spark集群'},
+                {id: 6, name: 'postgres_dw', type: 'POSTGRESQL', jdbcUrl: 'jdbc:postgresql://192.168.1.105:5432/datawarehouse', description: 'PostgreSQL数仓'},
+                {id: 7, name: 'hive_ods', type: 'HIVE', jdbcUrl: 'jdbc:hive2://192.168.1.106:10000/ods', description: 'ODS层Hive'},
+                {id: 8, name: 'mysql_report', type: 'MYSQL', jdbcUrl: 'jdbc:mysql://192.168.1.107:3306/report', description: '报表MySQL'},
+                {id: 9, name: 'clickhouse_ads', type: 'CLICKHOUSE', jdbcUrl: 'jdbc:clickhouse://192.168.1.108:8123/ads', description: '应用层ClickHouse'},
+                {id: 10, name: 'mysql_backup', type: 'MYSQL', jdbcUrl: 'jdbc:mysql://192.168.1.109:3306/backup', description: '备份MySQL'}
+            ],
+            instances: [
+                {id: 1001, name: 'user_behavior_etl_20260122_001', taskName: 'user_behavior_etl', status: 'SUCCESS', businessDate: '2026-01-22', startTime: '2026-01-22 02:00:05', duration: 925},
+                {id: 1002, name: 'data_backup_script_20260122_001', taskName: 'data_backup_script', status: 'RUNNING', businessDate: '2026-01-22', startTime: '2026-01-22 03:00:05', duration: null},
+                {id: 1003, name: 'ml_model_training_20260122_001', taskName: 'ml_model_training', status: 'FAILED', businessDate: '2026-01-22', startTime: '2026-01-22 01:00:05', duration: 1525},
+                {id: 1004, name: 'order_stat_daily_20260122_001', taskName: 'order_stat_daily', status: 'SUCCESS', businessDate: '2026-01-22', startTime: '2026-01-22 02:30:00', duration: 645},
+                {id: 1005, name: 'log_cleanup_20260122_001', taskName: 'log_cleanup', status: 'SUCCESS', businessDate: '2026-01-22', startTime: '2026-01-22 03:30:00', duration: 234},
+                {id: 1006, name: 'product_recommendation_20260122_001', taskName: 'product_recommendation', status: 'WAITING', businessDate: '2026-01-22', startTime: null, duration: null},
+                {id: 1007, name: 'inventory_sync_20260122_001', taskName: 'inventory_sync', status: 'RUNNING', businessDate: '2026-01-22', startTime: '2026-01-22 04:00:00', duration: null},
+                {id: 1008, name: 'user_behavior_etl_20260121_001', taskName: 'user_behavior_etl', status: 'SUCCESS', businessDate: '2026-01-21', startTime: '2026-01-21 02:00:03', duration: 862},
+                {id: 1009, name: 'data_backup_script_20260121_001', taskName: 'data_backup_script', status: 'SUCCESS', businessDate: '2026-01-21', startTime: '2026-01-21 03:00:08', duration: 456},
+                {id: 1010, name: 'order_stat_daily_20260121_001', taskName: 'order_stat_daily', status: 'SUCCESS', businessDate: '2026-01-21', startTime: '2026-01-21 02:30:05', duration: 678}
+            ],
+            servers: [
+                {id: 1, name: 'worker-prod-01', ip: '192.168.1.10', role: 'WORKER', status: 'ONLINE', cpuCores: 16, memory: 32768, currentTasks: 3, maxTasks: 10, lastHeartbeat: '2026-01-22 10:35:00'},
+                {id: 2, name: 'worker-prod-02', ip: '192.168.1.11', role: 'WORKER', status: 'ONLINE', cpuCores: 16, memory: 32768, currentTasks: 5, maxTasks: 10, lastHeartbeat: '2026-01-22 10:35:00'},
+                {id: 3, name: 'worker-prod-03', ip: '192.168.1.12', role: 'WORKER', status: 'OFFLINE', cpuCores: 16, memory: 32768, currentTasks: 0, maxTasks: 10, lastHeartbeat: '2026-01-22 09:15:00'},
+                {id: 4, name: 'master-prod-01', ip: '192.168.1.5', role: 'MASTER', status: 'ONLINE', cpuCores: 8, memory: 16384, currentTasks: 0, maxTasks: 0, lastHeartbeat: '2026-01-22 10:35:00'},
+                {id: 5, name: 'master-prod-02', ip: '192.168.1.6', role: 'MASTER', status: 'STANDBY', cpuCores: 8, memory: 16384, currentTasks: 0, maxTasks: 0, lastHeartbeat: '2026-01-22 10:35:00'}
+            ]
+        };
+
+        // 分页状态
+        const pageState = {
+            tasks: { current: 1, pageSize: 10, total: 0, data: [] },
+            instances: { current: 1, pageSize: 10, total: 0, data: [] }
+        };
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 导航切换
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const page = this.dataset.page;
+                    switchPage(page);
+                });
+            });
+
+            // 加载初始页面
+            loadTasksPage();
+            loadDatasourcesPage();
+            loadInstancesPage();
+            loadServersPage();
+
+            // 任务页面事件
+            document.getElementById('task-search').addEventListener('input', filterTasks);
+            document.getElementById('task-type-filter').addEventListener('change', filterTasks);
+            document.getElementById('task-status-filter').addEventListener('change', filterTasks);
+            document.getElementById('task-prev').addEventListener('click', () => changePage('tasks', -1));
+            document.getElementById('task-next').addEventListener('click', () => changePage('tasks', 1));
+
+            // 实例页面事件
+            document.getElementById('instance-search').addEventListener('input', filterInstances);
+            document.getElementById('instance-status-filter').addEventListener('change', filterInstances);
+            document.getElementById('instance-date').addEventListener('change', filterInstances);
+            document.getElementById('instance-prev').addEventListener('click', () => changePage('instances', -1));
+            document.getElementById('instance-next').addEventListener('click', () => changePage('instances', 1));
+        });
+
+        function switchPage(pageName) {
+            // 更新导航
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${pageName}"]`).classList.add('active');
+
+            // 切换页面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            document.getElementById(`${pageName}-page`).classList.remove('hidden');
+        }
+
+        function loadTasksPage() {
+            pageState.tasks.data = [...mockData.tasks];
+            pageState.tasks.total = pageState.tasks.data.length;
+            renderTasks();
+        }
+
+        function filterTasks() {
+            const search = document.getElementById('task-search').value.toLowerCase();
+            const typeFilter = document.getElementById('task-type-filter').value;
+            const statusFilter = document.getElementById('task-status-filter').value;
+
+            pageState.tasks.data = mockData.tasks.filter(task => {
+                const matchSearch = task.taskName.toLowerCase().includes(search);
+                const matchType = !typeFilter || task.taskType === typeFilter;
+                const matchStatus = !statusFilter || task.status === statusFilter;
+                return matchSearch && matchType && matchStatus;
+            });
+
+            pageState.tasks.total = pageState.tasks.data.length;
+            pageState.tasks.current = 1;
+            renderTasks();
+        }
+
+        function renderTasks() {
+            const tbody = document.getElementById('tasks-tbody');
+            const { current, pageSize, data, total } = pageState.tasks;
+
+            const start = (current - 1) * pageSize;
+            const end = Math.min(start + pageSize, data.length);
+            const pageData = data.slice(start, end);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">暂无数据</td></tr>';
+            } else {
+                tbody.innerHTML = pageData.map(task => `
+                    <tr>
+                        <td>${task.id}</td>
+                        <td>${task.taskName}</td>
+                        <td><span class="type-badge type-${task.taskType.toLowerCase()}">${task.taskType}</span></td>
+                        <td><span class="status-badge status-${task.status.toLowerCase()}">${getStatusText(task.status)}</span></td>
+                        <td>${task.owner}</td>
+                        <td>${task.createTime}</td>
+                        <td>
+                            <span class="action-link">编辑</span>
+                            <span class="action-link">查看</span>
+                            <span class="action-link">删除</span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // 更新分页信息
+            document.getElementById('task-total').textContent = total;
+            document.getElementById('task-current').textContent = current;
+            document.getElementById('task-pages').textContent = Math.ceil(total / pageSize) || 1;
+        }
+
+        function loadDatasourcesPage() {
+            const tbody = document.getElementById('datasources-tbody');
+            tbody.innerHTML = mockData.datasources.map(ds => `
+                <tr>
+                    <td>${ds.id}</td>
+                    <td>${ds.name}</td>
+                    <td><span class="type-badge">${ds.type}</span></td>
+                    <td>${ds.jdbcUrl}</td>
+                    <td>${ds.description}</td>
+                    <td>
+                        <span class="action-link">测试连接</span>
+                        <span class="action-link">编辑</span>
+                        <span class="action-link">删除</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadInstancesPage() {
+            pageState.instances.data = [...mockData.instances];
+            pageState.instances.total = pageState.instances.data.length;
+            renderInstances();
+        }
+
+        function filterInstances() {
+            const search = document.getElementById('instance-search').value.toLowerCase();
+            const statusFilter = document.getElementById('instance-status-filter').value;
+            const dateFilter = document.getElementById('instance-date').value;
+
+            pageState.instances.data = mockData.instances.filter(inst => {
+                const matchSearch = inst.name.toLowerCase().includes(search) || inst.taskName.toLowerCase().includes(search);
+                const matchStatus = !statusFilter || inst.status === statusFilter;
+                const matchDate = !dateFilter || inst.businessDate === dateFilter;
+                return matchSearch && matchStatus && matchDate;
+            });
+
+            pageState.instances.total = pageState.instances.data.length;
+            pageState.instances.current = 1;
+            renderInstances();
+        }
+
+        function renderInstances() {
+            const tbody = document.getElementById('instances-tbody');
+            const { current, pageSize, data, total } = pageState.instances;
+
+            const start = (current - 1) * pageSize;
+            const end = Math.min(start + pageSize, data.length);
+            const pageData = data.slice(start, end);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">暂无数据</td></tr>';
+            } else {
+                tbody.innerHTML = pageData.map(inst => `
+                    <tr>
+                        <td>${inst.id}</td>
+                        <td>${inst.name}</td>
+                        <td>${inst.taskName}</td>
+                        <td><span class="status-badge status-${inst.status.toLowerCase()}">${getInstanceStatusText(inst.status)}</span></td>
+                        <td>${inst.businessDate}</td>
+                        <td>${inst.startTime || '-'}</td>
+                        <td>${inst.duration ? formatDuration(inst.duration) : '-'}</td>
+                        <td>
+                            ${inst.status === 'FAILED' ? '<span class="action-link">重跑</span>' : ''}
+                            ${inst.status === 'RUNNING' ? '<span class="action-link">取消</span>' : ''}
+                            <span class="action-link">日志</span>
+                            <span class="action-link">详情</span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // 更新分页信息
+            document.getElementById('instance-total').textContent = total;
+            document.getElementById('instance-current').textContent = current;
+            document.getElementById('instance-pages').textContent = Math.ceil(total / pageSize) || 1;
+        }
+
+        function loadServersPage() {
+            const tbody = document.getElementById('servers-tbody');
+            tbody.innerHTML = mockData.servers.map(server => `
+                <tr>
+                    <td>${server.name}</td>
+                    <td>${server.ip}</td>
+                    <td><span class="type-badge">${server.role}</span></td>
+                    <td><span class="status-badge status-${server.status.toLowerCase()}">${getServerStatusText(server.status)}</span></td>
+                    <td>${server.cpuCores}</td>
+                    <td>${server.memory}</td>
+                    <td>${server.currentTasks}</td>
+                    <td>${server.maxTasks}</td>
+                    <td>${server.lastHeartbeat}</td>
+                </tr>
+            `).join('');
+        }
+
+        function changePage(module, delta) {
+            const state = pageState[module];
+            const maxPage = Math.ceil(state.total / state.pageSize);
+            const newPage = state.current + delta;
+
+            if (newPage >= 1 && newPage <= maxPage) {
+                state.current = newPage;
+                if (module === 'tasks') {
+                    renderTasks();
+                } else if (module === 'instances') {
+                    renderInstances();
+                }
+            }
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'ENABLED': '启用',
+                'DISABLED': '禁用',
+                'DEVELOPING': '开发中'
+            };
+            return map[status] || status;
+        }
+
+        function getInstanceStatusText(status) {
+            const map = {
+                'SUCCESS': '成功',
+                'FAILED': '失败',
+                'RUNNING': '运行中',
+                'WAITING': '等待中',
+                'CANCELED': '已取消'
+            };
+            return map[status] || status;
+        }
+
+        function getServerStatusText(status) {
+            const map = {
+                'ONLINE': '在线',
+                'OFFLINE': '离线',
+                'STANDBY': '备用'
+            };
+            return map[status] || status;
+        }
+
+        function formatDuration(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes}分${secs}秒`;
+        }
+    </script>
+</body>
+</html>

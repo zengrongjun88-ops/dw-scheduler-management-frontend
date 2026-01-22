@@ -1,8 +1,10 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { message } from 'antd';
+import { enableMockAdapter } from './mockAdapter';
 
-// API 基础URL
-const BASE_URL = 'http://localhost:8080/api';
+// 从环境变量读取配置
+const ENABLE_MOCK = import.meta.env.VITE_ENABLE_MOCK === 'true';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
 // 通用响应结构
 export interface ApiResponse<T = any> {
@@ -19,6 +21,12 @@ const instance: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// 启用Mock模式
+if (ENABLE_MOCK) {
+  console.log('[Mock] Mock mode enabled');
+  enableMockAdapter(instance);
+}
 
 // 请求拦截器
 instance.interceptors.request.use(

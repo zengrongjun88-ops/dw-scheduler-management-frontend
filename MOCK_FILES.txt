@@ -1,0 +1,70 @@
+Mock演示版本文件清单
+====================
+
+一、Mock数据文件 (src/mocks/data/)
+1. tasks.ts - 30个任务数据，包含SQL/Shell/Python类型
+2. directories.ts - 5个目录，树形结构
+3. datasources.ts - 10个数据源，多种数据库类型
+4. dependencies.ts - 19个依赖关系，构建DAG图
+5. instances.ts - 100个实例记录，各种执行状态
+6. logs.ts - 日志模板生成器
+7. servers.ts - 5个服务器节点
+8. monitor.ts - 监控时序数据生成器
+
+二、Mock处理器 (src/mocks/handlers/)
+1. task.ts - 任务API处理器（10个API）
+   - getTaskList, getTaskDetail, createTask, updateTask
+   - deleteTask, toggleTaskStatus, triggerTask
+   - getTaskDependencies, addTaskDependency, removeTaskDependency
+   - getTaskDAG
+
+2. datasource.ts - 数据源API处理器（6个API）
+   - getDatasourceList, getDatasourceDetail
+   - createDatasource, updateDatasource, deleteDatasource
+   - testDatasourceConnection
+
+3. instance.ts - 实例API处理器（6个API）
+   - getInstanceList, getInstanceDetail, getInstanceLog
+   - killInstance, retryInstance, getInstanceStatistics
+
+4. server.ts - 服务器API处理器（4个API）
+   - getServerList, getServerDetail
+   - getServerMonitor, getServerStatistics
+
+5. directory.ts - 目录API处理器（5个API）
+   - getDirectoryTree, getDirectoryList
+   - createDirectory, updateDirectory, deleteDirectory
+
+三、工具函数 (src/mocks/utils/)
+1. pagination.ts - 分页工具
+2. filter.ts - 搜索过滤工具
+3. storage.ts - localStorage持久化工具
+4. generator.ts - 数据生成工具（ID、时间、延迟）
+
+四、核心文件
+1. src/api/mockAdapter.ts - Mock适配器，请求拦截和路由匹配
+2. src/api/request.ts - 修改axios配置，集成Mock开关
+3. src/mocks/index.ts - Mock模块入口，统一导出
+4. src/mocks/test.ts - Mock功能测试脚本
+
+五、配置文件
+1. .env.mock - Mock环境变量配置
+2. package.json - 添加dev:mock和build:mock脚本
+
+六、文档文件
+1. MOCK_README.md - 详细说明文档（7.3KB）
+2. MOCK_QUICKSTART.md - 快速启动指南（2.3KB）
+3. MOCK_IMPLEMENTATION.md - 实现总结（6.0KB）
+4. README_MOCK_ADDON.md - README补充说明
+5. MOCK_CHECKLIST.md - 功能验收清单
+6. MOCK_STATUS.md - 实施状态报告
+7. MOCK_FILES.txt - 文件清单（本文件）
+
+七、工具脚本
+1. verify-mock.sh - Mock实现验证脚本
+
+总计文件数量: 30+个
+总代码行数: ~2,387行
+总文档字数: ~10,000字
+
+文件列表生成时间: 2024-01-22

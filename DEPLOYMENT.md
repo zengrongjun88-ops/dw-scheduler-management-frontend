@@ -17,10 +17,10 @@ npm run build
 ```nginx
 server {
     listen 80;
-    server_name scheduler-frontend.example.com;
+    server_name dw-scheduler-management-frontend.example.com;
     
     # 静态文件目录
-    root /var/www/scheduler-frontend/dist;
+    root /var/www/dw-scheduler-management-frontend/dist;
     index index.html;
     
     # SPA路由支持
@@ -58,7 +58,7 @@ server {
 npm run build
 
 # 复制到服务器
-scp -r dist/* user@server:/var/www/scheduler-frontend/dist/
+scp -r dist/* user@server:/var/www/dw-scheduler-management-frontend/dist/
 
 # 重启Nginx
 ssh user@server "sudo nginx -s reload"
@@ -117,13 +117,13 @@ server {
 
 ```bash
 # 构建镜像
-docker build -t scheduler-frontend:latest .
+docker build -t dw-scheduler-management-frontend:latest .
 
 # 运行容器
 docker run -d \
-  --name scheduler-frontend \
+  --name dw-scheduler-management-frontend \
   -p 80:80 \
-  scheduler-frontend:latest
+  dw-scheduler-management-frontend:latest
 ```
 
 ### 方式三: Docker Compose部署
@@ -138,7 +138,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: scheduler-frontend
+    container_name: dw-scheduler-management-frontend
     ports:
       - "80:80"
     environment:
@@ -267,14 +267,14 @@ Nginx错误日志: `/var/log/nginx/error.log`
 
 ```bash
 # 备份dist目录
-tar -czf scheduler-frontend-$(date +%Y%m%d).tar.gz dist/
+tar -czf dw-scheduler-management-frontend-$(date +%Y%m%d).tar.gz dist/
 ```
 
 ### 恢复
 
 ```bash
 # 解压备份文件
-tar -xzf scheduler-frontend-20260121.tar.gz -C /var/www/scheduler-frontend/
+tar -xzf dw-scheduler-management-frontend-20260121.tar.gz -C /var/www/dw-scheduler-management-frontend/
 ```
 
 ## 安全加固
@@ -284,7 +284,7 @@ tar -xzf scheduler-frontend-20260121.tar.gz -C /var/www/scheduler-frontend/
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name scheduler-frontend.example.com;
+    server_name dw-scheduler-management-frontend.example.com;
     
     ssl_certificate /path/to/cert.pem;
     ssl_certificate_key /path/to/key.pem;
@@ -295,7 +295,7 @@ server {
 # HTTP重定向到HTTPS
 server {
     listen 80;
-    server_name scheduler-frontend.example.com;
+    server_name dw-scheduler-management-frontend.example.com;
     return 301 https://$server_name$request_uri;
 }
 ```
@@ -345,11 +345,11 @@ echo "构建生产版本..."
 npm run build
 
 echo "备份当前版本..."
-tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz /var/www/scheduler-frontend/dist
+tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz /var/www/dw-scheduler-management-frontend/dist
 
 echo "部署新版本..."
-rm -rf /var/www/scheduler-frontend/dist
-cp -r dist /var/www/scheduler-frontend/
+rm -rf /var/www/dw-scheduler-management-frontend/dist
+cp -r dist /var/www/dw-scheduler-management-frontend/
 
 echo "重启Nginx..."
 sudo nginx -s reload
